@@ -1,7 +1,7 @@
 import * as babelParser from '@babel/parser';
 import traverse from '@babel/traverse';
 import * as fs from 'fs';
-import { File } from '@babel/types';
+import { File, Node } from '@babel/types';
 import { promisify } from 'util';
 import lint from './lint';
 
@@ -19,20 +19,21 @@ const ast : File  = babelParser.parse(tsxCode, {
 const tsxTemplateLiterals: string[] = [];
 
 traverse(ast, {
-  TemplateLiteral(path) {
+  TemplateLiteral(path: { node: Node; [key: string]: any }) {
     const comments = path.node.leadingComments;
     if (
-      comments &&
-      comments.some((comment) => comment.value.trim() === 'tsx')
+      comments && comments.some((comment) => comment.value.trim() === 'tsx')
     ) {
         //console.log('Found a tsx comment');
-      if (path.node.start == null || path.node.start == undefined || path.node.end == null || path.node.end == undefined) {
-        throw new Error('Invalid start or end');
+      if (path.node.start != null && path.node.end != null) {
+        const templateLiteralContent = tsxCode.substring(path.node.start + 1, path.node.end - 1);
+        //check if string is empty
+        if (templateLiteralContent.trim()) {
+            tsxTemplateLiterals.push(templateLiteralContent);
+          }
       } else { 
-        tsxTemplateLiterals.push(tsxCode.substring(path.node.start+1, path.node.end-1));
+        throw new Error('Template literal start and end are not defined');
       }
-
-      
     }
   },
 });
@@ -40,7 +41,7 @@ traverse(ast, {
 async function lintTsxTemplateLiterals() {
     for (const templateLiteral of tsxTemplateLiterals) {
       const lintedCode = await lint(templateLiteral);
-      tsxCode = tsxCode.replace(templateLiteral, lintedCode);
+      tsxCode = tsxCode.replace(new RegExp(`\`${templateLiteral}\``, 'g'), lintedCode);
     }
   
     try {
