@@ -73,6 +73,12 @@ export const DEFAULT_REACT_LOADING_FILES: SandpackBundlerFiles = {
   },
 };
 
+// export const DEFAULT_FILE: SandpackBundlerFiles = {
+//   "/App.tsx": {
+//     code: /*tsx*/ 
+//   },
+// };
+
 //TODO: Figure out why tailwind is so obsessed with compiling bg-[xyz] causing our compile to fail when the file is not there
 export const DEFAULT_REACT_FILES: SandpackBundlerFiles = {
   "/App.jsx": {

@@ -1,32 +1,35 @@
 import * as babelParser from '@babel/parser';
-import * as babelTraverse from '@babel/traverse';
+import traverse from '@babel/traverse';
 import * as fs from 'fs';
 import { File } from '@babel/types';
 import { promisify } from 'util';
 import lint from './lint';
 
+//read tsxCode from ts file
 var tsxCode : string = fs.readFileSync('ExhibitA.ts', 'utf8');
 
+// parse the tsxCode to AST
 const ast : File  = babelParser.parse(tsxCode, {
   sourceType: 'module',
   plugins: ['jsx', 'typescript'],
 });
 
-console.log(ast);
+
 
 const tsxTemplateLiterals: string[] = [];
 
-babelTraverse.default(ast, {
+traverse(ast, {
   TemplateLiteral(path) {
     const comments = path.node.leadingComments;
     if (
       comments &&
-      comments.some((comment) => comment.value.trim() === '/*tsx*/')
+      comments.some((comment) => comment.value.trim() === 'tsx')
     ) {
+        //console.log('Found a tsx comment');
       if (path.node.start == null || path.node.start == undefined || path.node.end == null || path.node.end == undefined) {
         throw new Error('Invalid start or end');
       } else { 
-        tsxTemplateLiterals.push(tsxCode.substring(path.node.start, path.node.end));
+        tsxTemplateLiterals.push(tsxCode.substring(path.node.start+1, path.node.end-1));
       }
 
       
