@@ -43,7 +43,7 @@ async function lintTsxTemplateLiterals() {
     }
   
     try {
-        await fs.promises.writeFile('outputFile.tsx', tsxCode, 'utf-8');
+        await fs.promises.writeFile('outputFile.ts', tsxCode, 'utf-8');
         console.log('File written successfully!');
       } catch (error) {
         console.error('Error writing file:', error);
