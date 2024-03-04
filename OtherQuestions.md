@@ -17,6 +17,10 @@ Modified Code String: Since each replacement operation generates a new string, t
 
 Overall space complexity : O(M + k*l +N)
 
+Edge Cases : 
+If the ExhibitA.ts file has invalid typescript syntax, i.e code: /*tsx*/ 
+without any valid template literals, babel will fail.
+
 
 Question 1 'document undefined'
 export async function arrayToBase64(array: Uint8Array) {
